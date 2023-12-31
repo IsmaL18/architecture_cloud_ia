@@ -25,3 +25,14 @@ L’architecture cloud liée à la première partie contient différents service
 
 
 # Deuxième Partie : Application
+
+L'architecture cloud liée à la deuxième partie est composée des services suivants :
+Une API Gateway qui fournit une interface pour que les utilisateurs enregistrent leur voix et créent un nouvel enregistrement audio, qui sera l’objet de la prédiction. Elle simplifie également l'accès aux services en exposant une API RESTful, facilitant ainsi l'enregistrement vocal des utilisateurs. Celle-ci communique les résultats de la prédiction à l’utilisateur, ce que nous verrons plus tard.
+- **Une Lambda**  qui vérifie les données et stocke l'enregistrement MP3 de l’utilisateur dans un bucket S3. Ceci est efficace pour une exécution sans serveur.
+- **Une Lambda** (S3_to_SQS) qui est déclenchée par l'ajout d'un enregistrement dans le bucket S3 et qui envoie l'enregistrement .Mp3 à une file SQS.
+- **Une Lambda** (SQS_to_EC2) qui se déclenche par l'ajout d'un message dans la file SQS et qui transmet les informations relatives à l’enregistrement mp3 vers un EC2.
+- Cet **EC2** contient les informations permettant de lire le modèle H5. Celui-ci est stocké dans le S3 bucket de la partie base de données. L’EC2 est un environnement personnalisé qui, dans notre cas, contient les informations relatives au modèle et à ses modifications.
+- **Une DynamoDB** qui stocke les résultats de la prédiction de l’âge de l’enregistrement vocal. C’est une base de données NoSQL, qui est adaptée pour le stockage de données en direct et la récupération rapide des résultats, comme pour la prédiction de l’âge d’un enregistrement vocal d’un utilisateur.
+- **Une Lambda**  qui se déclenche pour récupérer les résultats de prédiction depuis la DynamoDB et les transmettre à l'utilisateur via l'API Gateway. L’utilisateur obtient la prédiction de son âge juste après avoir enregistré son audio.
+- **Une Lambda**  qui se déclenche pour récupérer les résultats de prédiction depuis la DynamoDB et les transmettre à l'utilisateur via l'API Gateway. L’utilisateur obtient la prédiction de son âge juste après avoir enregistré son audio.
+
